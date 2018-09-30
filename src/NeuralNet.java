@@ -27,6 +27,7 @@ public class NeuralNet {
         Matrix inputsWithBias = inputs.addBias();
 
         Matrix weightedHiddenLayer1Inputs = hiWeights.dotProduct(inputsWithBias);
+        //weightedHiddenLayer1Inputs.print();
         Matrix activatedHiddenLayer1Outputs = weightedHiddenLayer1Inputs.activateRelU();
         Matrix activatedHiddenLayer1OutputsWithBias = activatedHiddenLayer1Outputs.addBias();
 
@@ -37,7 +38,17 @@ public class NeuralNet {
         Matrix weightedOutputLayerInputs = ohWeights.dotProduct(activatedHiddenLayer2OutputsWithBias);
         Matrix activatedOutputLayerOutputs = weightedOutputLayerInputs.activateRelU();
 
+
+
         return activatedOutputLayerOutputs.toArray();
+    }
+
+    NeuralNet getClone(){
+        NeuralNet temp = new NeuralNet(iNodes, hNodes, oNodes);
+        temp.hiWeights = this.hiWeights.getClone();
+        temp.hhWeights = this.hhWeights.getClone();
+        temp.ohWeights = this.ohWeights.getClone();
+        return temp;
     }
 
 }

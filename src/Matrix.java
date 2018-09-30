@@ -21,6 +21,9 @@ public class Matrix {
         matrix = new float[m.length][1];
         rows = m.length;
         cols = 1;
+        for(int i = 0; i < rows; i++){
+            matrix[i][0] = m[i];
+        }
     }
 
     void randomize(){
@@ -34,7 +37,7 @@ public class Matrix {
     void mutate(float mutationRate){
         for(int i = 0; i < rows; i++){
             for (int j = 0; j < cols; j++){
-                float mutationChance = rand.nextFloat();
+                float mutationChance = (rand.nextFloat() + 1)/2;
                 if(mutationChance < mutationRate){
                     matrix[i][j] += rand.nextGaussian()/5;
                 }
@@ -48,27 +51,36 @@ public class Matrix {
         }
     }
 
-    Matrix addBias(){
-        Matrix m = new Matrix(rows, cols +1);
-            for(int i = 0; i < rows; i++){
-                for(int j = 0; j < cols; j++){
-                    m.matrix[i][j] = this.matrix[i][j];
-                }
-                m.matrix[i][cols + 1] = 1;
+    Matrix getClone(){
+        Matrix temp = new Matrix(rows, cols);
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                temp.matrix[i][j] = this.matrix[i][j];
             }
-            return m;
+        }
+        return temp;
     }
+
+    Matrix addBias(){
+        Matrix m = new Matrix(rows + 1, 1);
+            for(int i = 0; i < rows; i++){
+                m.matrix[i][0] = this.matrix[i][0];
+            }
+            m.matrix[rows][0] = 1;
+        return m;
+    }
+
 
     Matrix dotProduct(Matrix m){
         if(cols != m.rows){
-            System.out.println("Invalid Dot Product Dimensions");
+            System.out.println("Invalid Dot Product Dimensions " + rows + "X" + cols + " and " + m.rows + "X" + m.cols);
             return null;
         }
 
         Matrix output = new Matrix(rows, m.cols);
         for (int i = 0; i < rows; i++){
             for(int j = 0; j < m.cols; j++){
-                int sum = 0;
+                float sum = 0;
                 for (int k = 0; k < cols; k++){
                     sum += this.matrix[i][k] * m.matrix[k][j];
                 }
@@ -103,6 +115,16 @@ public class Matrix {
             result[i] = this.matrix[i][0];
         }
         return result;
+    }
+
+    void print(){
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++) {
+                System.out.print(this.matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 
 

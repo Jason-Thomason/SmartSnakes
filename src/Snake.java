@@ -30,14 +30,33 @@ public class Snake {
         pos = new Coordinate(x, y);
         velocity = new Coordinate(10, 0);
         tailPositions = new ArrayList<Coordinate>();
+        tailPositions.add(new Coordinate(x - 40, y));
         tailPositions.add(new Coordinate(x - 30, y));
         tailPositions.add(new Coordinate(x - 20, y ));
         tailPositions.add(new Coordinate(x - 10, y ));
-        size += 3;
+        size += 4;
 
         newFood();
 
         brain = new NeuralNet(24, 18, 2);
+        idleTimer = 200;
+    }
+
+    Snake(NeuralNet parentBrain){
+        int x = 250;
+        int y = 450;
+        pos = new Coordinate(x, y);
+        velocity = new Coordinate(10, 0);
+        tailPositions = new ArrayList<Coordinate>();
+        tailPositions.add(new Coordinate(x - 40, y));
+        tailPositions.add(new Coordinate(x - 30, y));
+        tailPositions.add(new Coordinate(x - 20, y ));
+        tailPositions.add(new Coordinate(x - 10, y ));
+        size += 4;
+
+        newFood();
+
+        brain = parentBrain.getClone();
         idleTimer = 200;
     }
 
@@ -69,7 +88,9 @@ public class Snake {
         lifetime += 1;
         idleTimer -= 1;
 
-        if(idleTimer < 0 || outOfBounds(pos)){
+        calculateFitness();
+
+        if(idleTimer < 0 || outOfBounds(pos) || isOnTail(pos)){
             alive = false;
         }else if(pos.x == food.position.x && pos.y == food.position.y){
             eat();
@@ -93,7 +114,9 @@ public class Snake {
     }
 
     void grow(){
-
+        temp = new Coordinate(pos.x, pos.y);
+        tailPositions.add(temp);
+        size++;
     }
 
     void eat(){
@@ -149,7 +172,7 @@ public class Snake {
         while(!outOfBounds(tempScanner)){
             if(!foodIsFound && tempScanner.x == food.position.x && tempScanner.y == food.position.y){
                 foodIsFound = true;
-                results[0] = 1/distance;
+                results[0] = 1;
             }
 
             if(!tailIsFound && isOnTail(tempScanner)){
@@ -161,6 +184,8 @@ public class Snake {
             distance += 1;
         }
         results[2] = 1/distance;
+        //Matrix m = new Matrix(results);
+        //m.print();
         return results;
     }
 
@@ -178,11 +203,15 @@ public class Snake {
     }
 
     Coordinate decideAction(float[] brainOutputs){
+        //System.out.println(brainOutputs[0] + " vs " + brainOutputs[1]);
         if(brainOutputs[0] > brainOutputs[1]){
+            //System.out.println("Turning Left");
             return turnLeft(velocity);
         }else if(brainOutputs[0] < brainOutputs[1]){
+            //System.out.println("Turning Right");
             return turnRight(velocity);
         }else{
+            //System.out.println("Not Turning");
             return velocity;
         }
     }
@@ -216,6 +245,11 @@ public class Snake {
         }
         return new Coordinate(newX, newY);
     }
+
+    void calculateFitness(){
+        fitness = lifetime * size * size;
+    }
+
     void render(Graphics g){
         g.setColor(Color.CYAN);
         g.fillRect(pos.x, pos.y, 10, 10);
@@ -230,5 +264,6 @@ public class Snake {
             g.setColor(Color.BLUE);
             g.drawRect(tp.x, tp.y, 10, 10);
         }
+        food.render(g);
     }
 }
