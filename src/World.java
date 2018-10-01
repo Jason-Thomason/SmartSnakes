@@ -41,7 +41,7 @@ public class World {
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.setColor(Color.WHITE);
         g.drawString("Gen: " + gen, 15, 15);
-        g.drawString("Fitness: " + population.averageFitness, 15, 30);
+        g.drawString("Fitness: " + population.topAverageFitness, 15, 30);
         g.drawString("Snakes Left: " + population.aliveSnakes, 15, 45);
         snakeBeingWatched.render(g);
         if(population.aliveSnakes < 10){

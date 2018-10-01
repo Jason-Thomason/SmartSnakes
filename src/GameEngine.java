@@ -13,12 +13,12 @@ public class GameEngine implements Runnable {
 	public static boolean GAME_IS_RUNNING;
 
 	private int loops;
-	private static int FPS = 35, MAX_FRAME_SKIP = 2, msPerUpdate = 1000 / FPS;
+	private static int FPS = 30, MAX_FRAME_SKIP = 2, msPerUpdate = 1000 / FPS;
 	private long CURRENT_TIME = System.currentTimeMillis();
 
 	static GameEngine engine;
 
-	private static int POPULATIONS = 5, POPULATIONSIZE = 200;
+	private static int POPULATIONS = 5, POPULATIONSIZE = 500;
 
 	public static void main(String[] args) {
 		engine = new GameEngine();

@@ -37,8 +37,10 @@ public class Matrix {
     void mutate(float mutationRate){
         for(int i = 0; i < rows; i++){
             for (int j = 0; j < cols; j++){
-                float mutationChance = (rand.nextFloat() + 1)/2;
+                float mutationChance = (float)(rand.nextFloat());
+                //System.out.println("MutationChance:" + mutationChance + " MutationRate:" + mutationRate);
                 if(mutationChance < mutationRate){
+                    float temp = matrix[i][j];
                     matrix[i][j] += rand.nextGaussian()/5;
                 }
 

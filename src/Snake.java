@@ -34,7 +34,7 @@ public class Snake {
         tailPositions.add(new Coordinate(x - 30, y));
         tailPositions.add(new Coordinate(x - 20, y ));
         tailPositions.add(new Coordinate(x - 10, y ));
-        size += 4;
+        size = 5;
 
         newFood();
 
@@ -52,7 +52,7 @@ public class Snake {
         tailPositions.add(new Coordinate(x - 30, y));
         tailPositions.add(new Coordinate(x - 20, y ));
         tailPositions.add(new Coordinate(x - 10, y ));
-        size += 4;
+        size = 5;
 
         newFood();
 
@@ -171,7 +171,7 @@ public class Snake {
         while(!outOfBounds(tempScanner)){
             if(!foodIsFound && tempScanner.x == food.position.x && tempScanner.y == food.position.y){
                 foodIsFound = true;
-                results[0] = 1;
+                results[0] = 1/distance;
             }
 
             if(!tailIsFound && isOnTail(tempScanner)){
@@ -246,7 +246,7 @@ public class Snake {
     }
 
     void calculateFitness(){
-        fitness = lifetime/10 + size*size;
+        fitness = lifetime/10 + size*size*size;
     }
 
     void render(Graphics g){
