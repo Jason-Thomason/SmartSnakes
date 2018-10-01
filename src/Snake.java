@@ -25,15 +25,15 @@ public class Snake {
 
 
     Snake(){
-        int x = 250;
-        int y = 450;
+        int x = Math.floorDiv(GameEngine.GRID_WIDTH, 2);
+        int y = Math.floorDiv(GameEngine.GRID_WIDTH, 10) * 9;
         pos = new Coordinate(x, y);
-        velocity = new Coordinate(10, 0);
+        velocity = new Coordinate(1, 0);
         tailPositions = new ArrayList<Coordinate>();
-        tailPositions.add(new Coordinate(x - 40, y));
-        tailPositions.add(new Coordinate(x - 30, y));
-        tailPositions.add(new Coordinate(x - 20, y ));
-        tailPositions.add(new Coordinate(x - 10, y ));
+        tailPositions.add(new Coordinate(x - 4, y));
+        tailPositions.add(new Coordinate(x - 3, y));
+        tailPositions.add(new Coordinate(x - 2, y ));
+        tailPositions.add(new Coordinate(x - 1, y ));
         size = 5;
 
         newFood();
@@ -43,15 +43,15 @@ public class Snake {
     }
 
     Snake(NeuralNet parentBrain){
-        int x = 250;
-        int y = 450;
+        int x = Math.floorDiv(GameEngine.GRID_WIDTH, 2);
+        int y = Math.floorDiv(GameEngine.GRID_WIDTH, 10) * 9;
         pos = new Coordinate(x, y);
-        velocity = new Coordinate(10, 0);
+        velocity = new Coordinate(1, 0);
         tailPositions = new ArrayList<Coordinate>();
-        tailPositions.add(new Coordinate(x - 40, y));
-        tailPositions.add(new Coordinate(x - 30, y));
-        tailPositions.add(new Coordinate(x - 20, y ));
-        tailPositions.add(new Coordinate(x - 10, y ));
+        tailPositions.add(new Coordinate(x - 4, y));
+        tailPositions.add(new Coordinate(x - 3, y));
+        tailPositions.add(new Coordinate(x - 2, y ));
+        tailPositions.add(new Coordinate(x - 1, y ));
         size = 5;
 
         newFood();
@@ -61,11 +61,11 @@ public class Snake {
     }
 
     void newFood(){
-        int x = (rand.nextInt(49) + 1) *10;
-        int y = (rand.nextInt(49) + 1) *10;
+        int x = (rand.nextInt(GameEngine.GRID_WIDTH -1) + 1);
+        int y = (rand.nextInt(GameEngine.GRID_WIDTH -1) + 1);
         while(isOnTail(new Coordinate(x, y)) || (x == pos.x && y == pos.y)){
-            x = (rand.nextInt(49) + 1) *10;
-            y = (rand.nextInt(49) + 1) *10;
+            x = (rand.nextInt(GameEngine.GRID_WIDTH -1) + 1);
+            y = (rand.nextInt(GameEngine.GRID_WIDTH -1) + 1);
         }
         food = new Food(new Coordinate(x,y));
     }
@@ -121,40 +121,44 @@ public class Snake {
     void eat(){
         newFood();
         idleTimer += 100;
+        idleTimer += size*4;
+        if(idleTimer > 400){
+            idleTimer = 400;
+        }
         growCount += 3;
     }
 
     void lookAndSetVisionValues(){
         vision = new float[24];
-        float[] temp = lookForFoodTailAndWallInDirection(-10, 0);
+        float[] temp = lookForFoodTailAndWallInDirection(-1, 0);
         vision[0] = temp[0];
         vision[1] = temp[1];
         vision[2] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(-10, 10);
+        temp = lookForFoodTailAndWallInDirection(-1, 1);
         vision[3] = temp[0];
         vision[4] = temp[1];
         vision[5] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(0, 10);
+        temp = lookForFoodTailAndWallInDirection(0, 1);
         vision[6] = temp[0];
         vision[7] = temp[1];
         vision[8] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(10, 10);
+        temp = lookForFoodTailAndWallInDirection(1, 1);
         vision[9] = temp[0];
         vision[10] = temp[1];
         vision[11] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(10, 0);
+        temp = lookForFoodTailAndWallInDirection(1, 0);
         vision[12] = temp[0];
         vision[13] = temp[1];
         vision[14] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(10, -10);
+        temp = lookForFoodTailAndWallInDirection(1, -1);
         vision[15] = temp[0];
         vision[16] = temp[1];
         vision[17] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(0, -10);
+        temp = lookForFoodTailAndWallInDirection(0, -1);
         vision[18] = temp[0];
         vision[19] = temp[1];
         vision[20] = temp[2];
-        temp = lookForFoodTailAndWallInDirection(-10, -10);
+        temp = lookForFoodTailAndWallInDirection(-1, -1);
         vision[21] = temp[0];
         vision[22] = temp[1];
         vision[23] = temp[2];
@@ -189,7 +193,8 @@ public class Snake {
     }
 
     boolean outOfBounds(Coordinate c){
-        return (c.x <= 0 || c.x >= 500 || c.y <= 0 || c.y >= 500);
+        return (c.x <= 0 || c.x >= GameEngine.GRID_WIDTH
+                || c.y <= 0 || c.y >= GameEngine.GRID_HEIGHT);
     }
 
     boolean isOnTail(Coordinate c){
@@ -217,12 +222,12 @@ public class Snake {
 
     Coordinate turnLeft(Coordinate c){
         int newX, newY;
-        if(Math.abs(c.x) == 10){
+        if(Math.abs(c.x) == 1){
             newX = 0;
         }else{
             newX = c.y * (-1);
         }
-        if(Math.abs(c.y) == 10){
+        if(Math.abs(c.y) == 1){
             newY = 0;
         }else{
             newY = c.x;
@@ -232,12 +237,12 @@ public class Snake {
 
     Coordinate turnRight(Coordinate c){
         int newX, newY;
-        if(Math.abs(c.x) == 10){
+        if(Math.abs(c.x) == 1){
             newX = 0;
         }else{
-            newX = c.y * 1;
+            newX = c.y;
         }
-        if(Math.abs(c.y) == 10){
+        if(Math.abs(c.y) == 1){
             newY = 0;
         }else{
             newY = c.x * (-1);
@@ -249,19 +254,25 @@ public class Snake {
         fitness = lifetime/10 + size*size*size;
     }
 
+    NeuralNet crossover(Snake partner){
+        return  this.brain.crossover(partner.brain);
+    }
+
     void render(Graphics g){
         g.setColor(Color.CYAN);
-        g.fillRect(pos.x, pos.y, 10, 10);
+        g.fillRect(pos.x*GameEngine.UNIT_SIZE, pos.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
         g.setColor(Color.BLUE);
-        g.drawRect(pos.x, pos.y, 10, 10);
+        g.drawRect(pos.x*GameEngine.UNIT_SIZE, pos.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
         g.setColor(Color.BLACK);
-        g.fillOval(pos.x +8, pos.y +2, 1, 2);
-        g.fillOval(pos.x +8, pos.y +6, 1, 2);
+        g.fillOval((pos.x*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*8), (pos.y*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*2)
+                , Math.floorDiv(GameEngine.UNIT_SIZE, 10), Math.floorDiv(GameEngine.UNIT_SIZE, 5));
+        g.fillOval((pos.x*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*8), (pos.y*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*6)
+                , Math.floorDiv(GameEngine.UNIT_SIZE, 10), Math.floorDiv(GameEngine.UNIT_SIZE, 5));
         for (Coordinate tp : tailPositions){
             g.setColor(Color.CYAN);
-            g.fillRect(tp.x, tp.y, 10, 10);
+            g.fillRect(tp.x*GameEngine.UNIT_SIZE, tp.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
             g.setColor(Color.BLUE);
-            g.drawRect(tp.x, tp.y, 10, 10);
+            g.drawRect(tp.x*GameEngine.UNIT_SIZE, tp.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
         }
         food.render(g);
     }
