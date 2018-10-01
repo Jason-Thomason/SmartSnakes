@@ -18,7 +18,7 @@ public class GameEngine implements Runnable {
 
 	static GameEngine engine;
 
-	private static int POPULATIONS = 5, POPULATIONSIZE = 500;
+	private static int POPULATIONS = 5, POPULATIONSIZE = 200;
 
 	public static void main(String[] args) {
 		engine = new GameEngine();

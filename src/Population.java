@@ -1,3 +1,5 @@
+import java.util.Random;
+
 import static jdk.nashorn.internal.objects.NativeMath.random;
 
 public class Population {
@@ -10,6 +12,7 @@ public class Population {
     int currentBest = 4;
     int currentBestSnake = 0;
     float mutationRate = (float)0.01;
+    int topAverageFitness = 0;
     boolean dead;
 
     Snake globalBestSnake;
@@ -29,11 +32,8 @@ public class Population {
         snakes = new Snake[size];
 
         snakes[0] = fittestSnakeFromLastPopulation;
-        for (int i = 1; i < 11; i++){
-            snakes[i] = new Snake(fittestSnakeFromLastPopulation.brain);
-            snakes[i].mutate((float)0.5);
-        }
-        for (int i = 11; i < size; i++){
+
+        for (int i = 1; i < size; i++){
             snakes[i] = new Snake(fittestSnakeFromLastPopulation.brain);
             snakes[i].mutate(mutationRate);
         }
@@ -43,6 +43,7 @@ public class Population {
 
     void updateAlive(){
         aliveSnakes = 0;
+        updateAverageFitness();
         for(Snake s: snakes){
             if(s.alive){
                 aliveSnakes++;
@@ -50,6 +51,17 @@ public class Population {
             }
         }
 
+    }
+
+    void updateAverageFitness(){
+        int currentAverageFitness = 0;
+        for(Snake s: snakes){
+            currentAverageFitness += s.fitness;
+        }
+        currentAverageFitness = Math.floorDiv(currentAverageFitness, snakes.length);
+        if(currentAverageFitness > topAverageFitness){
+            topAverageFitness = currentAverageFitness;
+        }
     }
 
     Snake getFirstAliveSnake(){
@@ -71,6 +83,33 @@ public class Population {
             }
         }
         return bestSnake;
+    }
+
+    void breedNextGeneration(){
+        Snake[] newSnakes = new Snake[snakes.length];
+        for(int i = 0; i < snakes.length; i++){
+            newSnakes[i] = breedNewSnake().getClone();
+            newSnakes[i].mutate(mutationRate);
+        }
+        snakes = newSnakes;
+        dead = false;
+    }
+
+    Snake breedNewSnake(){
+        long totalFitness = 0;
+        for(int i = 0; i < snakes.length; i++){
+            totalFitness += snakes[i].fitness;
+        }
+        Random rand = new Random();
+        long gateValue = (long)(rand.nextDouble() * totalFitness);
+        long runningTotal = 0;
+        for(int i = 0; i < snakes.length; i++){
+            runningTotal += snakes[i].fitness;
+            if(runningTotal > gateValue){
+                return snakes[i];
+            }
+        }
+        return globalBestSnake;
     }
 
 }

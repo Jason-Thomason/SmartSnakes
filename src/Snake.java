@@ -75,8 +75,7 @@ public class Snake {
     }
 
     Snake getClone(){
-        Snake s = new Snake();
-
+        Snake s = new Snake(this.brain);
         return s;
     }
 
@@ -247,7 +246,7 @@ public class Snake {
     }
 
     void calculateFitness(){
-        fitness = lifetime * size * size;
+        fitness = lifetime/10 + size*size;
     }
 
     void render(Graphics g){
