@@ -51,4 +51,12 @@ public class NeuralNet {
         return temp;
     }
 
+    NeuralNet crossover(NeuralNet partnerBrain){
+        NeuralNet crossoverNet = new NeuralNet(iNodes, hNodes, oNodes);
+        crossoverNet.hiWeights = this.hiWeights.crossover(partnerBrain.hiWeights);
+        crossoverNet.hhWeights = this.hhWeights.crossover(partnerBrain.hhWeights);
+        crossoverNet.ohWeights = this.ohWeights.crossover(partnerBrain.ohWeights);
+        return crossoverNet;
+    }
+
 }

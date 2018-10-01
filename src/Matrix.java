@@ -40,7 +40,6 @@ public class Matrix {
                 float mutationChance = (float)(rand.nextFloat());
                 //System.out.println("MutationChance:" + mutationChance + " MutationRate:" + mutationRate);
                 if(mutationChance < mutationRate){
-                    float temp = matrix[i][j];
                     matrix[i][j] += rand.nextGaussian()/5;
                 }
 
@@ -61,6 +60,26 @@ public class Matrix {
             }
         }
         return temp;
+    }
+
+    Matrix crossover(Matrix partner){
+        if(rows != partner.rows || cols != partner.cols){
+            System.out.println("Cannot Crossover Matrix");
+            return getClone();
+        }
+        Matrix result = new Matrix(rows, cols);
+        int crossoverRow = rand.nextInt(rows);
+        int crossoverCol = rand.nextInt(cols);
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                if(i > crossoverRow || j > crossoverCol){
+                    result.matrix[i][j] = this.matrix[i][j];
+                }else{
+                    result.matrix[i][j] = partner.matrix[i][j];
+                }
+            }
+        }
+        return result;
     }
 
     Matrix addBias(){

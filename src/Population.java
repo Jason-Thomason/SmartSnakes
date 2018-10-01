@@ -96,6 +96,13 @@ public class Population {
     }
 
     Snake breedNewSnake(){
+        Snake parent1 = selectParentSnake();
+        Snake parent2 = selectParentSnake();
+        NeuralNet crossoverBrain = crossover(parent1, parent2);
+        return new Snake(crossoverBrain);
+    }
+
+    Snake selectParentSnake(){
         long totalFitness = 0;
         for(int i = 0; i < snakes.length; i++){
             totalFitness += snakes[i].fitness;
@@ -106,10 +113,15 @@ public class Population {
         for(int i = 0; i < snakes.length; i++){
             runningTotal += snakes[i].fitness;
             if(runningTotal > gateValue){
-                return snakes[i];
+                return snakes[i].getClone();
             }
         }
+        System.out.println("selectParentSnake failed...");
         return globalBestSnake;
+    }
+
+    NeuralNet crossover(Snake parent1, Snake parent2){
+        return parent1.crossover(parent2);
     }
 
 }

@@ -11,6 +11,6 @@ public class Food {
 
     void render(Graphics g){
         g.setColor(Color.RED);
-        g.fillRect(position.x, position.y, 10, 10);
+        g.fillRect(position.x*GameEngine.UNIT_SIZE, position.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
     }
 }
