@@ -15,8 +15,10 @@ public class Snake {
 
     Random rand = new Random();
     int lifetime = 0;
-    long fitness = 0;
+    int fitness = 0;
     int idleTimer = 200;
+    Color color, outlineColor;
+    int colorAlpha;
 
     int growCount = 0;
 
@@ -38,7 +40,8 @@ public class Snake {
 
         newFood();
 
-        brain = new NeuralNet(24, 18, 2);
+        brain = new NeuralNet(24, 18, 3);
+        setColor();
         idleTimer = 200;
     }
 
@@ -57,7 +60,24 @@ public class Snake {
         newFood();
 
         brain = parentBrain.getClone();
+        setColor();
         idleTimer = 200;
+    }
+
+    void setColor(){
+        double midValue = 255 / 2;
+        int rColor = (int) (Math.cos(brain.hiWeights.sum()/10) * midValue + midValue + 0.5);
+        int gColor = (int) (Math.cos(brain.hhWeights.sum()/10) * midValue + midValue + 0.5);
+        int bColor = (int) (Math.cos(brain.ohWeights.sum()/10) * midValue + midValue + 0.5);
+
+        color = new Color(rColor, gColor, bColor, colorAlpha);
+    }
+
+    void updateAlpha(double reletiveFitness){
+        //System.out.println("reletiveFitness[" + reletiveFitness + "]");
+        colorAlpha = (int)Math.floor(reletiveFitness*255);
+        color = new Color(color.getRed(), color.getGreen(), color.getBlue(), colorAlpha);
+        outlineColor = new Color(255, 255, 255, colorAlpha);
     }
 
     void newFood(){
@@ -75,8 +95,7 @@ public class Snake {
     }
 
     Snake getClone(){
-        Snake s = new Snake(this.brain);
-        return s;
+        return new Snake(this.brain);
     }
 
     void update(){
@@ -193,8 +212,8 @@ public class Snake {
     }
 
     boolean outOfBounds(Coordinate c){
-        return (c.x <= 0 || c.x >= GameEngine.GRID_WIDTH
-                || c.y <= 0 || c.y >= GameEngine.GRID_HEIGHT);
+        return (c.x < 0 || c.x >= GameEngine.GRID_WIDTH
+                || c.y < 0 || c.y >= GameEngine.GRID_HEIGHT);
     }
 
     boolean isOnTail(Coordinate c){
@@ -209,13 +228,14 @@ public class Snake {
     Coordinate decideAction(float[] brainOutputs){
         //System.out.println(brainOutputs[0] + " vs " + brainOutputs[1]);
         if(brainOutputs[0] > brainOutputs[1]){
-            //System.out.println("Turning Left");
-            return turnLeft(velocity);
-        }else if(brainOutputs[0] < brainOutputs[1]){
-            //System.out.println("Turning Right");
+            if(brainOutputs[0] > brainOutputs[2]){
+                return turnLeft(velocity);
+            }else{
+                return velocity;
+            }
+        }else if(brainOutputs[1] > brainOutputs[2]){
             return turnRight(velocity);
         }else{
-            //System.out.println("Not Turning");
             return velocity;
         }
     }
@@ -251,7 +271,8 @@ public class Snake {
     }
 
     void calculateFitness(){
-        fitness = lifetime/10 + size*size*size;
+        fitness = size*size + (int)Math.floor(10 * Math.log(lifetime/50 + 1));
+        //System.out.println((lifetime*lifetime)/1000 + " + " +  lifetime/100);
     }
 
     NeuralNet crossover(Snake partner){
@@ -259,9 +280,9 @@ public class Snake {
     }
 
     void render(Graphics g){
-        g.setColor(Color.CYAN);
+        g.setColor(color);
         g.fillRect(pos.x*GameEngine.UNIT_SIZE, pos.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
-        g.setColor(Color.BLUE);
+        g.setColor(outlineColor);
         g.drawRect(pos.x*GameEngine.UNIT_SIZE, pos.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
         g.setColor(Color.BLACK);
         g.fillOval((pos.x*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*8), (pos.y*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*2)
@@ -269,11 +290,11 @@ public class Snake {
         g.fillOval((pos.x*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*8), (pos.y*GameEngine.UNIT_SIZE)+(Math.floorDiv(GameEngine.UNIT_SIZE, 10)*6)
                 , Math.floorDiv(GameEngine.UNIT_SIZE, 10), Math.floorDiv(GameEngine.UNIT_SIZE, 5));
         for (Coordinate tp : tailPositions){
-            g.setColor(Color.CYAN);
+            g.setColor(color);
             g.fillRect(tp.x*GameEngine.UNIT_SIZE, tp.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
-            g.setColor(Color.BLUE);
+            g.setColor(outlineColor);
             g.drawRect(tp.x*GameEngine.UNIT_SIZE, tp.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
         }
-        food.render(g);
+        //food.render(g, colorAlpha);
     }
 }

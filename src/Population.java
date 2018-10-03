@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.Random;
 
 import static jdk.nashorn.internal.objects.NativeMath.random;
@@ -10,12 +11,13 @@ public class Population {
     int aliveSnakes;
     long globalBestFitness = 0;
     int currentBest = 4;
-    int currentBestSnake = 0;
     float mutationRate = (float)0.01;
-    int topAverageFitness = 0;
+    int topAverageFitness = 1;
+    int currentBestFitness = 1;
     boolean dead;
+    Random rand = new Random();
 
-    Snake globalBestSnake;
+    Snake globalBestSnake, generationBestSnake;
 
     Population(int size){
         snakes = new Snake[size];
@@ -48,6 +50,12 @@ public class Population {
             if(s.alive){
                 aliveSnakes++;
                 s.update();
+                if(currentBestFitness < s.fitness) {
+                    currentBestFitness = s.fitness;
+                }
+                double alphaValue = (double)s.fitness/currentBestFitness;
+                s.updateAlpha(alphaValue);
+                //s.updateAlpha((double)s.fitness/topAverageFitness);
             }
         }
 
@@ -55,8 +63,12 @@ public class Population {
 
     void updateAverageFitness(){
         int currentAverageFitness = 0;
+        currentBestFitness = 1;
         for(Snake s: snakes){
             currentAverageFitness += s.fitness;
+            if(currentBestFitness < s.fitness){
+                currentBestFitness = s.fitness;
+            }
         }
         currentAverageFitness = Math.floorDiv(currentAverageFitness, snakes.length);
         if(currentAverageFitness > topAverageFitness){
@@ -71,35 +83,57 @@ public class Population {
             }
         }
         dead = true;
-        globalBestSnake = calculateBestSnake();
-        return globalBestSnake;
+        return globalBestSnake.getClone();
     }
 
-    Snake calculateBestSnake(){
-        Snake bestSnake = snakes[0];
+    Snake calculateGenerationBestSnake(){
+        generationBestSnake = snakes[0];
         for(Snake s: snakes){
-            if(s.fitness > bestSnake.fitness){
-                bestSnake = s;
+            if(s.fitness > generationBestSnake.fitness){
+                generationBestSnake = s;
             }
         }
-        return bestSnake;
+        return generationBestSnake;
     }
 
     void breedNextGeneration(){
+
         Snake[] newSnakes = new Snake[snakes.length];
-        for(int i = 0; i < snakes.length; i++){
+        calculateGenerationBestSnake();
+        System.out.println("Best Snake: " + generationBestSnake.fitness);
+        updateGlobalBestSnake();
+        newSnakes[0] = globalBestSnake.getClone();
+        globalBestSnake = newSnakes[0];
+        for(int i = 1; i < snakes.length; i++){
             newSnakes[i] = breedNewSnake().getClone();
             newSnakes[i].mutate(mutationRate);
         }
-        snakes = newSnakes;
+        snakes = newSnakes.clone();
         dead = false;
+    }
+
+    void updateGlobalBestSnake(){
+        if(generationBestSnake.fitness > globalBestSnake.fitness){
+            globalBestSnake = generationBestSnake;
+        }
     }
 
     Snake breedNewSnake(){
         Snake parent1 = selectParentSnake();
         Snake parent2 = selectParentSnake();
-        NeuralNet crossoverBrain = crossover(parent1, parent2);
-        return new Snake(crossoverBrain);
+        NeuralNet babyBrain;
+        double crossoverProbability = rand.nextDouble();
+        if(GameEngine.CROSSOVER){
+            if(crossoverProbability > 0.5){
+                //System.out.println("Crossover Performed");
+                babyBrain = crossover(parent1, parent2);
+            }else{
+                babyBrain = parent1.brain.getClone();
+            }
+        }else{
+            babyBrain = parent1.brain.getClone();
+        }
+        return new Snake(babyBrain);
     }
 
     Snake selectParentSnake(){
@@ -113,15 +147,23 @@ public class Population {
         for(int i = 0; i < snakes.length; i++){
             runningTotal += snakes[i].fitness;
             if(runningTotal > gateValue){
-                return snakes[i].getClone();
+                    return snakes[i].getClone();
             }
         }
-        System.out.println("selectParentSnake failed...");
-        return globalBestSnake;
+        return selectParentSnake();
     }
 
     NeuralNet crossover(Snake parent1, Snake parent2){
         return parent1.crossover(parent2);
+    }
+
+    void renderAliveSnakes(Graphics g){
+        for(Snake s: snakes){
+            if(s.alive){
+                s.render(g);
+            }
+
+        }
     }
 
 }

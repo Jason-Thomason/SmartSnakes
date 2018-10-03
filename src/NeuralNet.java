@@ -36,7 +36,7 @@ public class NeuralNet {
         Matrix activatedHiddenLayer2OutputsWithBias = activatedHiddenLayer2Outputs.addBias();
 
         Matrix weightedOutputLayerInputs = ohWeights.dotProduct(activatedHiddenLayer2OutputsWithBias);
-        Matrix activatedOutputLayerOutputs = weightedOutputLayerInputs.activateRelU();
+        Matrix activatedOutputLayerOutputs = weightedOutputLayerInputs.activateSoftMax();
 
 
 
@@ -57,6 +57,10 @@ public class NeuralNet {
         crossoverNet.hhWeights = this.hhWeights.crossover(partnerBrain.hhWeights);
         crossoverNet.ohWeights = this.ohWeights.crossover(partnerBrain.ohWeights);
         return crossoverNet;
+    }
+
+    float sum(){
+        return hiWeights.sum() + hhWeights.sum() + ohWeights.sum();
     }
 
 }

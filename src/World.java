@@ -38,12 +38,15 @@ public class World {
 
 
     void render(Graphics g){
-        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.setFont(new Font("Arial", Font.BOLD, GameEngine.UNIT_SIZE));
         g.setColor(Color.WHITE);
-        g.drawString("Gen: " + gen, 15, 15);
-        g.drawString("Fitness: " + population.topAverageFitness, 15, 30);
-        g.drawString("Snakes Left: " + population.aliveSnakes, 15, 45);
-        snakeBeingWatched.render(g);
+        g.drawString("Gen: " + gen, GameEngine.UNIT_SIZE, 15);
+        g.drawString("Fitness: " + population.topAverageFitness, GameEngine.UNIT_SIZE, 30);
+        g.drawString("Snakes Left: " + population.aliveSnakes, GameEngine.UNIT_SIZE, 45);
+        g.drawString("Crossover: " + GameEngine.CROSSOVER, GameEngine.UNIT_SIZE, 60);
+        //snakeBeingWatched.render(g);
+        population.renderAliveSnakes(g);
+        //System.out.println(snakeBeingWatched.fitness);
         if(population.aliveSnakes < 10){
             for(int i = 0; i < population.aliveSnakes; i++){
                 //population.snakes[i].render(g);

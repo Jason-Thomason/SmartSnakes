@@ -9,8 +9,9 @@ public class Food {
         position = c;
     }
 
-    void render(Graphics g){
-        g.setColor(Color.RED);
+    void render(Graphics g, int colorAlpha){
+        Color color = Color.RED;
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), colorAlpha));
         g.fillRect(position.x*GameEngine.UNIT_SIZE, position.y*GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE, GameEngine.UNIT_SIZE);
     }
 }

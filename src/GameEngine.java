@@ -13,13 +13,14 @@ public class GameEngine implements Runnable {
 	public static boolean GAME_IS_RUNNING;
 
 	private int loops;
-	static final int UNIT_SIZE = 20, GRID_WIDTH = 40, GRID_HEIGHT = 40;
-	private static int FPS = 60, MAX_FRAME_SKIP = 2, msPerUpdate = 1000 / FPS;
+	static final int UNIT_SIZE = 12, GRID_WIDTH = 50, GRID_HEIGHT = 50;
+	static final boolean CROSSOVER = true;
+	private static int FPS = 45, MAX_FRAME_SKIP = 2, msPerUpdate = 1000 / FPS;
 	private long CURRENT_TIME = System.currentTimeMillis();
 
 	static GameEngine engine;
 
-	private static int POPULATIONS = 5, POPULATIONSIZE = 1000;
+	private static int POPULATIONS = 5, POPULATIONSIZE = 400;
 
 	public static void main(String[] args) {
 		window  = new Window(GRID_WIDTH*UNIT_SIZE, GRID_HEIGHT*UNIT_SIZE);

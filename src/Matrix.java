@@ -126,6 +126,27 @@ public class Matrix {
         return activatedValueMatrix;
     }
 
+    Matrix activateTanh(){
+        return this;
+    }
+
+    Matrix activateSoftMax(){
+        if(this.cols > 1){
+            System.out.println("Cannot Activate for " + cols + " column matrix");
+            return null;
+        }
+        float sum = 0;
+        for(int i = 0; i < this.rows; i++){
+            sum += Math.pow(Math.E, this.matrix[i][0]);
+        }
+
+        Matrix activatedValueMatrix = new Matrix(this.rows, 1);
+        for(int i = 0; i < this.rows; i++){
+            activatedValueMatrix.matrix[i][0] = (float)(Math.pow(Math.E, this.matrix[i][0]))/sum;
+        }
+        return activatedValueMatrix;
+    }
+
     float[] toArray(){
         if(cols > 1){
             System.out.println("Cannot convert " + cols + " column matrix to array");
@@ -146,6 +167,16 @@ public class Matrix {
             System.out.println();
         }
         System.out.println();
+    }
+
+    float sum(){
+        float sum = 0;
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                sum += matrix[i][j];
+            }
+        }
+        return sum;
     }
 
 
